@@ -5,7 +5,7 @@
   "main": "convert.ts",
   "scripts": {
     "convert": "tsc ./src/convert.ts && node ./src/convert.js ./../testowy && rm ./src/convert.js",
-    "convert-exec": "tsc convert.ts && node convert.js ../testowy --change && rm convert.js",
+    "convert-exec": "tsc ./src/convert.ts && node ./src/convert.js ./../testowy --change && rm ./src/convert.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

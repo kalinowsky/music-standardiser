@@ -24,9 +24,10 @@ const sanitizeFileName = (fileName: string): string => {
 
 const formatFileName = (fileName: string): string => {
   // Regex to match filenames with an optional leading number + period and an optional mix in parentheses
+  fileName = fileName.replace(/_/g, ' '); // Replace underscores with spaces
 
   const regexFullInfo =
-    /^(\d+\.?\s?)?(.*) - (.*?)( \(.*?\))?(\.mp3|\.wav|\.flac)$/i;
+    /^(\d+\.?-?\s?)?(.*)-(.*?)( \(.*?\))?(\.mp3|\.wav|\.flac)$/i;
   const matchFullInfo = fileName.match(regexFullInfo);
   if (matchFullInfo) {
     // If the file starts with a number and a period (e.g., "01."), we remove it
@@ -39,15 +40,21 @@ const formatFileName = (fileName: string): string => {
     const mix = matchFullInfo[4] || ''; // Capture the mix version if it exists, otherwise leave empty
     const extension = (matchFullInfo[5] || '').toLowerCase(); // Normalize extension to lowercase
     // console.log({ match });
-    return sanitizeFileName(`${artist} - ${title}${mix}${extension}`);
+    return sanitizeFileName(
+      artist && title
+        ? `${artist} - ${title}${mix}${extension}`
+        : `${artist || title}${mix}${extension}`
+    );
   }
 
   const regexJustTitleOrArtist =
     /^(\d+\.?\s?)?\w*-?\w*(.*?)( \(.*?\))?(\.mp3|\.wav|\.flac)$/i;
   const matchJustTitleOrArist = fileName.match(regexJustTitleOrArtist);
   if (matchJustTitleOrArist) {
-    console.log('jest match', { matchJustTitleOrArist });
+    // console.log('jest match', { matchJustTitleOrArist });
+    console.log('matchJustTitleOrArist', fileName);
   }
+  console.log('na wyjsciu', fileName);
   return ''; // Return empty string if no match is found
 };
 
