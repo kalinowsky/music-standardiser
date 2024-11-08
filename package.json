@@ -4,7 +4,7 @@
   "description": "",
   "main": "convert.ts",
   "scripts": {
-    "convert": "tsc ./src/convert.ts && node ./src/convert.js ./../testowy && rm ./src/convert.js",
+    "convert": "tsc ./src/convert.ts && node ./src/convert.js ./.. && rm ./src/convert.js",
     "convert-exec": "tsc ./src/convert.ts && node ./src/convert.js ./../testowy --change && rm ./src/convert.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

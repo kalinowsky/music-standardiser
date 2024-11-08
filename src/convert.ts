@@ -10,9 +10,8 @@ const colors = {
 } as const;
 
 // Helper function for colored logging
-const log = (text: string, color: keyof typeof colors = 'WHITE') => {
+const log = (text: string, color: keyof typeof colors = 'WHITE') =>
   console.log(`${colors[color]}${text}${colors.RESET}`);
-};
 
 // Function to sanitize file names by removing special characters
 const sanitizeFileName = (fileName: string): string => {
@@ -27,7 +26,7 @@ const formatFileName = (fileName: string): string => {
   fileName = fileName.replace(/_/g, ' '); // Replace underscores with spaces
 
   const regexFullInfo =
-    /^(\d+\.?-?\s?)?(.*)-(.*?)( \(.*?\))?(\.mp3|\.wav|\.flac)$/i;
+    /^(\d+\.?\s?-?\s?)?(.*)-(.*?)( \(.*?\))?(\.mp3|\.wav|\.flac)$/i;
   const matchFullInfo = fileName.match(regexFullInfo);
   if (matchFullInfo) {
     // If the file starts with a number and a period (e.g., "01."), we remove it
@@ -54,7 +53,7 @@ const formatFileName = (fileName: string): string => {
     // console.log('jest match', { matchJustTitleOrArist });
     console.log('matchJustTitleOrArist', fileName);
   }
-  console.log('na wyjsciu', fileName);
+
   return ''; // Return empty string if no match is found
 };
 
@@ -81,7 +80,7 @@ const listChanges = (
 
     // Check if the file name already matches the desired format
     if (newFileName && file === newFileName) {
-      log(`Correctly named: ${file}`, 'GREEN');
+      log(`CORRECT:     ${file}`, 'GREEN');
       return;
     }
 
@@ -92,7 +91,7 @@ const listChanges = (
         fs.renameSync(oldPath, newPath);
         log(`Renamed: ${file} -> ${newFileName}`, 'YELLOW');
       } else {
-        log(`Will rename: ${file} -> ${newFileName}`, 'YELLOW');
+        log(`RENAME :     ${file} -> ${newFileName}`, 'YELLOW');
       }
     }
 
