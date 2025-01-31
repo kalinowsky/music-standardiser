@@ -8,6 +8,7 @@ const colors = {
   YELLOW: '\x1b[33m',
   WHITE: '\x1b[37m',
   RESET: '\x1b[0m',
+  PURPLE: '\x1b[35m',
 } as const;
 
 // Helper function for colored logging
@@ -50,13 +51,19 @@ const formatFileName = async (orgFileName: string): Promise<string> => {
   const regexJustTitleOrArtist =
     /^(\d+\.?\s?)?\w*-?\w*(.*?)( \(.*?\))?(\.mp3|\.wav|\.flac)$/i;
   const matchJustTitleOrArist = fileName.match(regexJustTitleOrArtist);
+
   if (matchJustTitleOrArist) {
     const fileNameWithPath = `../${orgFileName}`;
-    const result = mm.parseFile(fileNameWithPath);
-    console.log({ result });
+    const result = await mm.parseFile(fileNameWithPath);
+    if (result.common.artist && result.common.title) {
+      log(`${fileName} extracted from metadata`, 'PURPLE');
+      return sanitizeFileName(
+        `${result.common.artist} - ${result.common.title}`
+      );
+    }
   }
 
-  return ''; // Return empty string if no match is found
+  return '';
 };
 
 // Function to retrieve a list of music files from a folder
@@ -75,7 +82,7 @@ const listChanges = async (
   const proposedChanges: [string, string][] = [];
   const duplicateFiles: Set<string> = new Set();
 
-  files.forEach(async (file) => {
+  const process = async (file: any) => {
     const oldPath = path.join(folderPath, file);
     const newFileName = await formatFileName(file);
     const newPath = path.join(folderPath, newFileName);
@@ -110,7 +117,11 @@ const listChanges = async (
     } else {
       duplicateFiles.add(uniqueKey);
     }
-  });
+  };
+
+  for (const file of files) {
+    await process(file);
+  }
 
   if (!applyChanges && proposedChanges.length === 0) {
     log('No proposed changes.', 'WHITE');
@@ -128,7 +139,7 @@ const main = async () => {
     return;
   }
 
-  await listChanges(folderPath, applyChanges);
+  listChanges(folderPath, applyChanges);
 };
 
 main();
