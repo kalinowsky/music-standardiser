@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as mm from 'music-metadata';
 import * as path from 'path';
 
 const colors = {
@@ -21,9 +22,9 @@ const sanitizeFileName = (fileName: string): string => {
     .trim();
 };
 
-const formatFileName = (fileName: string): string => {
+const formatFileName = async (orgFileName: string): Promise<string> => {
   // Regex to match filenames with an optional leading number + period and an optional mix in parentheses
-  fileName = fileName.replace(/_/g, ' '); // Replace underscores with spaces
+  const fileName = orgFileName.replace(/_/g, ' '); // Replace underscores with spaces
 
   const regexFullInfo =
     /^(\d+\.?\s?-?\s?)?(.*)-(.*?)( \(.*?\))?(\.mp3|\.wav|\.flac)$/i;
@@ -50,8 +51,9 @@ const formatFileName = (fileName: string): string => {
     /^(\d+\.?\s?)?\w*-?\w*(.*?)( \(.*?\))?(\.mp3|\.wav|\.flac)$/i;
   const matchJustTitleOrArist = fileName.match(regexJustTitleOrArtist);
   if (matchJustTitleOrArist) {
-    // console.log('jest match', { matchJustTitleOrArist });
-    console.log('matchJustTitleOrArist', fileName);
+    const fileNameWithPath = `../${orgFileName}`;
+    const result = mm.parseFile(fileNameWithPath);
+    console.log({ result });
   }
 
   return ''; // Return empty string if no match is found
@@ -65,17 +67,17 @@ const getMusicFiles = (folderPath: string): string[] => {
 };
 
 // Function to list and propose file name changes
-const listChanges = (
+const listChanges = async (
   folderPath: string,
   applyChanges: boolean = false
-): void => {
+): Promise<void> => {
   const files = getMusicFiles(folderPath);
   const proposedChanges: [string, string][] = [];
   const duplicateFiles: Set<string> = new Set();
 
-  files.forEach((file) => {
+  files.forEach(async (file) => {
     const oldPath = path.join(folderPath, file);
-    const newFileName = formatFileName(file);
+    const newFileName = await formatFileName(file);
     const newPath = path.join(folderPath, newFileName);
 
     // Check if the file name already matches the desired format
@@ -116,7 +118,7 @@ const listChanges = (
 };
 
 // Main function of the script
-const main = () => {
+const main = async () => {
   const args = process.argv.slice(2);
   const folderPath = args[0] ? path.resolve(args[0]) : path.resolve('./music'); // Path given as argument or default
   const applyChanges = args.includes('--change');
@@ -126,7 +128,7 @@ const main = () => {
     return;
   }
 
-  listChanges(folderPath, applyChanges);
+  await listChanges(folderPath, applyChanges);
 };
 
 main();
